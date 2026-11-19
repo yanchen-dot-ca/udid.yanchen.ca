@@ -9,9 +9,10 @@
 //   udid.yanchen.ca/enroll              -> POST from the device
 //   udid.yanchen.ca/profile.mobileconfig -> profile download
 //
-// Everything else falls through to GitHub Pages. Nothing is stored
-// or logged; the UDID returns to the page in the URL fragment
-// (after #), which browsers never send to a server.
+// Everything else falls through to GitHub Pages. The Worker itself
+// stores and logs nothing; it answers the enroll POST with a 301
+// to the result page carrying the values in the query string
+// (the form the device's profile installer accepts).
 //
 // The profile below is the CMS/PKCS#7-signed form of
 // profile-unsigned.mobileconfig (in this folder), signed with the
@@ -59,7 +60,16 @@ export default {
         const value = pick(body, key);
         if (value) params.set(key.toLowerCase(), value);
       }
-      return Response.redirect(RESULT_PAGE + "#" + params.toString(), 302);
+      // Match the reference implementations (udid.tech and the
+      // open-source UDID servers): a 301 to a result URL carrying
+      // the values in the QUERY STRING. The device's profile
+      // installer follows this redirect itself during install;
+      // a 302 to a #fragment URL made installation fail with
+      // "Invalid Profile" on iOS 27.
+      return new Response(null, {
+        status: 301,
+        headers: { location: RESULT_PAGE + "?" + params.toString() },
+      });
     }
 
     // GitHub Pages serves the profile as application/octet-stream,

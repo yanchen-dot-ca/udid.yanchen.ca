@@ -44,10 +44,10 @@
   <li>Tap <strong>Install</strong> — you'll be sent back here with your UDID.</li>
 </ol>
 
-<p class="note">Private by design: the profile only asks iOS for your device identifiers and hands them straight back to this page. The UDID is returned in the address fragment (after the #), which browsers never send to a server, and nothing is stored.</p>
+<p class="note">Private by design: the profile only asks iOS for your device identifiers and hands them straight back to this page. Nothing is stored or logged.</p>
 
 <script>
-  var params = new URLSearchParams(location.hash.slice(1));
+  var params = new URLSearchParams(location.search || location.hash.slice(1));
   var udid = params.get('udid');
   if (udid) {
     document.getElementById('udidValue').textContent = udid;
