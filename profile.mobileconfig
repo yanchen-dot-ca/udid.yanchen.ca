@@ -19,11 +19,11 @@
 	<key>PayloadDisplayName</key>
 	<string>udid.yanchen.ca — Get UDID</string>
 	<key>PayloadIdentifier</key>
-	<string>ca.yanchen.udid</string>
+	<string>ca.yanchen.udid.profile-service</string>
 	<key>PayloadOrganization</key>
 	<string>yanchen.ca</string>
 	<key>PayloadType</key>
-	<string>Configuration</string>
+	<string>Profile Service</string>
 	<key>PayloadUUID</key>
 	<string>1A255C46-2B0F-458C-9227-9A8A4C00CE41</string>
 	<key>PayloadVersion</key>
