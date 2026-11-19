@@ -44,11 +44,29 @@ Do these in order:
 5. On an iPhone, open https://udid.yanchen.ca in Safari and run
    through the flow once to verify.
 
-## Notes
+## The profile must be SIGNED
 
-- The profile is unsigned, so iOS labels it "Not Verified" during
-  install. That is normal for this kind of tool; signing would need
-  a certificate whose private key we control for this purpose.
-- `profile.mobileconfig` in this repo and the copy embedded in
-  `worker.js` must stay identical — the repo file is the fallback
-  download, the Worker copy is what most visitors actually get.
+Current iOS refuses to install an *unsigned* Profile Service
+profile — installation fails with "Invalid Profile" (learned the
+hard way, 2026-11-18). The profile is therefore CMS/PKCS#7-signed
+with the Let's Encrypt certificate for `udid.yanchen.ca`:
+
+- Source XML: `profile-unsigned.mobileconfig` in this folder.
+  Its top-level `PayloadType` must be `Profile Service` (not
+  `Configuration`) and the identifier is
+  `ca.yanchen.udid.profile-service`.
+- Signing: `sh sign.sh` (openssl smime, DER, with the cert chain).
+  It refreshes `profile-signed.mobileconfig`, the repo-root
+  `profile.mobileconfig`, and the base64 copy embedded in
+  `worker.js` (`PROFILE_DER_B64`) in one go. All three must stay
+  in sync — the Worker copy is what visitors actually get.
+- The certificate was issued with certbot in manual DNS-01 mode
+  (`certbot certonly --manual --preferred-challenges dns
+  -d udid.yanchen.ca`), adding the `_acme-challenge.udid` TXT
+  record in the Cloudflare dashboard. It is NOT auto-renewed.
+  **The cert expires 2027-02-17**; before then, repeat the
+  certbot command, run `sign.sh`, redeploy the Worker, and push.
+  The cert/key backup lives outside this (public) repo in
+  `~/workspace/udid-certs/` on Sky's VM — never commit a key here.
+- During install iOS shows the signer as the certificate holder
+  (Let's Encrypt chain); there is no "Not Verified" warning.
